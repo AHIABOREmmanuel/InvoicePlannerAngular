@@ -1,0 +1,78 @@
+<div class="min-vh-100 bg-gradient d-flex align-items-center justify-content-center p-4" style="background: linear-gradient(to right, #1976d2, #0d47a1);">
+  <div class="bg-white rounded-4 shadow p-5 w-100" style="max-width: 600px;">
+    <div class="text-center mb-4">
+      <h1 class="display-5 fw-bold text-gradient">Ajout Prestation</h1>
+      <p class="text-muted">Ajoutez une nouvelle prestation</p>
+    </div>
+
+    <form [formGroup]="prestationForm" (ngSubmit)="onSubmit()">
+      <div class="row g-3 mb-3">
+        <div class="col-md-6">
+          <label for="designation" class="form-label">designation</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="ph-duotone ph-tag"></i>
+</span>
+            <input id="designation" type="text" formControlName="designation" class="form-control" placeholder="designation de la prestation" />
+          </div>
+          <div *ngIf="prestationForm.get('designation')?.invalid && prestationForm.get('designation')?.touched" class="text-danger small mt-1">designation requis</div>
+        </div>
+
+        <div class="col-md-6">
+          <label for="description" class="form-label">Description</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="ph-duotone ph-scroll"></i>
+            </span>
+            <input id="description" type="text" formControlName="description" class="form-control" placeholder="Description de la prestation" />
+          </div>
+          <div *ngIf="prestationForm.get('description')?.invalid && prestationForm.get('description')?.touched" class="text-danger small mt-1">Description requise</div>
+        </div>
+      </div>
+
+      <!-- Durée & Prix Unitaire sur la même ligne -->
+      <div class="row g-3 mb-3">
+        <div class="col-md-6">
+          <label for="duree" class="form-label">Durée de la prestation</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="ph-duotone ph-clock"></i></span>
+            <input id="duree" type="text" formControlName="duree" class="form-control" placeholder="Durée en H" />
+          </div>
+          <div *ngIf="prestationForm.get('duree')?.invalid && prestationForm.get('duree')?.touched" class="text-danger small mt-1">Durée requise</div>
+        </div>
+
+        <div class="col-md-6">
+          <label for="prixUnitaire" class="form-label">Prix Unitaire</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="ph-duotone ph-currency-dollar"></i></span>
+            <input id="prixUnitaire" type="number" formControlName="prixUnitaire" class="form-control" placeholder="Prix unitaire" />
+          </div>
+          <div *ngIf="prestationForm.get('prixUnitaire')?.invalid && prestationForm.get('prixUnitaire')?.touched" class="text-danger small mt-1">Prix unitaire invalide</div>
+        </div>
+      </div>
+
+      <!-- Prix Total centré -->
+      <!-- <div class="row g-3 mb-3 justify-content-center">
+        <div class="col-md-8">
+          <label for="prixTotal" class="form-label">Prix Total</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="ph-duotone ph-currency-dollar"></i></span>
+            <input id="prixTotal" type="number" formControlName="prixTotal" class="form-control text-center" placeholder="Prix total" />
+          </div>
+          <div *ngIf="prestationForm.get('prixTotal')?.invalid && prestationForm.get('prixTotal')?.touched" class="text-danger small mt-1 text-center">Prix total invalide</div>
+        </div>
+      </div> -->
+
+      <button type="submit" class="btn btn-primary w-100 mb-3" [disabled]="prestationForm.invalid">
+        <i class="ph-duotone ph-user-plus me-2"></i>
+        <span>Créer la prestation</span>
+      </button>
+
+      <div *ngIf="isLoading" class="alert alert-info d-flex align-items-center mt-3">
+        <span class="ms-2">Chargement...</span>
+      </div>
+
+      <div *ngIf="errorMessage" class="alert alert-danger d-flex align-items-center mt-3">
+        <div class="ms-2">{{ errorMessage }}</div>
+      </div>
+    </form>
+  </div>
+</div>

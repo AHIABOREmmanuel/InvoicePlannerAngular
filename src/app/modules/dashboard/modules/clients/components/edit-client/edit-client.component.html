@@ -1,0 +1,170 @@
+<div
+  class="min-vh-100 bg-gradient d-flex align-items-center justify-content-center p-4"
+  style="background: linear-gradient(to right, #1976d2, #0d47a1)"
+>
+  <div class="bg-white rounded-4 shadow p-5 w-100" style="max-width: 600px">
+    <div class="text-center mb-4">
+      <h1 class="display-5 fw-bold text-gradient">Modifier Client</h1>
+      <p class="text-muted">Mettez à jour les informations du client</p>
+    </div>
+
+    <form [formGroup]="clientForm" (ngSubmit)="onUpdate()">
+      <h2 class="h3 fw-semibold mb-4">Informations Client</h2>
+
+      <div class="row g-3 mb-3">
+        <div class="col-md-6">
+          <label for="nom" class="form-label">Nom</label>
+          <div class="input-group">
+            <span class="input-group-text"
+              ><i class="ph-duotone ph-user"></i
+            ></span>
+            <input
+              id="nom"
+              type="text"
+              formControlName="nom"
+              class="form-control"
+              placeholder="Nom du client"
+            />
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <label for="adresse" class="form-label">Adresse</label>
+          <div class="input-group">
+            <span class="input-group-text"
+              ><i class="ph-duotone ph-location"></i
+            ></span>
+            <input
+              id="adresse"
+              type="text"
+              formControlName="adresse"
+              class="form-control"
+              placeholder="Adresse du client"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="row g-3 mb-3">
+        <div class="col-md-6">
+          <label for="email" class="form-label">Email</label>
+          <div class="input-group">
+            <span class="input-group-text"
+              ><i class="ph-duotone ph-envelope-simple"></i
+            ></span>
+            <input
+              id="email"
+              type="email"
+              formControlName="email"
+              class="form-control"
+              placeholder="Email du client"
+            />
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <label for="telephone" class="form-label">Numéro de téléphone</label>
+          <div class="input-group">
+            <span class="input-group-text"
+              ><i class="ph-duotone ph-phone"></i
+            ></span>
+            <input
+              id="telephone"
+              type="tel"
+              formControlName="telephone"
+              class="form-control"
+              placeholder="Numéro de téléphone"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="row g-3 mb-3">
+        <div class="col-md-6">
+          <label for="societe" class="form-label">Société</label>
+          <div class="input-group">
+            <span class="input-group-text"
+              ><i class="ph-duotone ph-building"></i
+            ></span>
+            <input
+              id="societe"
+              type="text"
+              formControlName="societe"
+              class="form-control"
+              placeholder="Société du client"
+            />
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <label for="numeroTVA" class="form-label">Numéro TVA</label>
+          <div class="input-group">
+            <span class="input-group-text"
+              ><i class="ph-duotone ph-barcode"></i
+            ></span>
+            <input
+              id="numeroTVA"
+              type="text"
+              formControlName="numeroTVA"
+              class="form-control"
+              placeholder="Numéro TVA"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="row g-3 mb-3">
+        <div class="col-md-6">
+          <label for="ville" class="form-label">Ville</label>
+          <div class="input-group">
+            <span class="input-group-text"
+              ><i class="ph-duotone ph-city"></i
+            ></span>
+            <input
+              id="ville"
+              type="text"
+              formControlName="ville"
+              class="form-control"
+              placeholder="Ville du client"
+            />
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <label for="pays" class="form-label">Pays</label>
+          <div class="input-group">
+            <span class="input-group-text"
+              ><i class="ph-duotone ph-globe"></i
+            ></span>
+            <input
+              id="pays"
+              type="text"
+              formControlName="pays"
+              class="form-control"
+              placeholder="Pays du client"
+            />
+          </div>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary w-100 mb-3">
+        <i class="ph-duotone ph-user-check me-2"></i>
+        <span>Mettre à jour</span>
+      </button>
+
+      <div
+        *ngIf="isLoading"
+        class="alert alert-info d-flex align-items-center mt-3"
+      >
+        <span class="ms-2">Mise à jour en cours...</span>
+      </div>
+
+      <div
+        *ngIf="errorMessage"
+        class="alert alert-danger d-flex align-items-center mt-3"
+      >
+        <div class="ms-2">{{ errorMessage }}</div>
+      </div>
+    </form>
+  </div>
+</div>

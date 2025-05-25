@@ -1,0 +1,101 @@
+<div
+  class="min-vh-100 bg-gradient d-flex align-items-center justify-content-center p-4"
+  style="background: linear-gradient(to right, #1976d2, #0d47a1)"
+>
+  <div class="bg-white rounded-4 shadow p-5 w-100" style="max-width: 600px">
+    <div class="text-center mb-4">
+      <h1 class="display-5 fw-bold text-gradient">Modifier Prestation</h1>
+      <p class="text-muted">Mettez à jour les informations de la Prestation</p>
+    </div>
+
+    <form [formGroup]="prestationForm" (ngSubmit)="onUpdate()">
+      <!-- <h2 class="h3 fw-semibold mb-4">Informations Prestation</h2> -->
+
+      <div class="row g-3 mb-3">
+        <div class="col-md-6">
+          <label for="designation" class="form-label">designation</label>
+          <div class="input-group">
+            <span class="input-group-text"
+              ><i class="ph-duotone ph-tag"></i
+            ></span>
+            <input
+              id="designation"
+              type="text"
+              formControlName="designation"
+              class="form-control"
+              placeholder="designation"
+            />
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <label for="description" class="form-label">Description</label>
+          <div class="input-group">
+            <span class="input-group-text"
+              ><i class="ph-duotone ph-scroll"></i
+            ></span>
+            <input
+              id="description"
+              type="text"
+              formControlName="description"
+              class="form-control"
+              placeholder="Description de la prestation"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="row g-3 mb-3">
+        <div class="col-md-6">
+          <label for="duree" class="form-label">Durée</label>
+          <div class="input-group">
+            <span class="input-group-text"
+              ><i class="ph-duotone ph-clock"></i
+            ></span>
+            <input
+              id="duree"
+              type="text"
+              formControlName="duree"
+              class="form-control"
+              placeholder="Durée de la prestation"
+            />
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <label for="prixUnitaire" class="form-label">Prix Unitaire</label>
+          <div class="input-group">
+            <span class="input-group-text"
+              ><i class="ph-duotone ph-currency-dollar"></i
+            ></span>
+            <input
+              id="prixUnitaire"
+              type="number"
+              formControlName="prixUnitaire"
+              class="form-control"
+              placeholder="Prix unitaire"
+            />
+          </div>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary w-100 mb-3">
+        <i class="ph-duotone ph-user-check me-2"></i>
+        <span>Mettre à jour</span>
+      </button>
+
+      <div
+        *ngIf="isLoading"
+        class="alert alert-info d-flex align-items-center mt-3"
+      >
+        <span class="ms-2">Mise à jour en cours...</span>
+      </div>
+
+      <div
+        *ngIf="errorMessage"
+        class="alert alert-danger d-flex align-items-center mt-3"
+      >
+        <div class="ms-2">{{ errorMessage }}</div>
+      </div>
+    </form>
+  </div>
+</div>

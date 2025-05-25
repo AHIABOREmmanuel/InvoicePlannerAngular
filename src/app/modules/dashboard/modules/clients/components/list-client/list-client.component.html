@@ -1,0 +1,166 @@
+<div class="pc-container">
+  <div class="pc-content">
+    <!-- [ breadcrumb ] start -->
+    <div class="page-header">
+      <div class="page-block">
+        <div class="row align-items-center">
+          <div class="col-md-12">
+            <ul class="breadcrumb">
+              <li class="breadcrumb-item">
+                <a href="..\dashboard\index.html">Home</a>
+              </li>
+              <li class="breadcrumb-item">
+                <a href="javascript: void(0)">Clients</a>
+              </li>
+              <li aria-current="page" class="breadcrumb-item active">List</li>
+            </ul>
+          </div>
+          <div class="col-md-12">
+            <div class="page-header-title">
+              <h2 class="mb-0">List</h2>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- [ breadcrumb ] end -->
+    <!-- [ Main Content ] start -->
+    <div class="row">
+      <div class="col-12 mb-4">
+        <div class="card bg-primary">
+          <div class="card-body">
+            <div class="d-flex align-items-center justify-content-between">
+              <div class="d-flex align-items-center">
+                <div class="flex-shrink-0">
+                  <div class="avtar bg-white bg-opacity-10 text-white" (click)="addClient()" style="cursor: pointer; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;">
+                    <i class="ph-duotone ph-user-plus f-24"></i>
+                  </div>
+                </div>
+                <div class="flex-grow-1 ms-3">
+                  <h4 class="text-white mb-1">Ajouter un nouveau client</h4>
+                  <p class="text-white mb-0">Cliquez ici pour créer un nouveau client</p>
+                </div>
+              </div>
+              <div class="text-end">
+                <h3 class="text-white mb-0">Total Clients</h3>
+                <h2 class="text-white mb-0 fw-bold">{{ clientsResponse.length }}</h2>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-12">
+        <div class="card">
+          <div class="card-body">
+            <div class="table-responsive">
+              <div class="datatable-wrapper datatable-loading no-footer searchable fixed-columns">
+                <div class="datatable-top">
+                  <div class="datatable-dropdown">
+                    <label>
+                      <select class="datatable-selector" name="per-page">
+                        <option value="5">5</option>
+                        <option value="10" selected="">10</option>
+                        <option value="15">15</option>
+                        <option value="20">20</option>
+                        <option value="25">25</option>
+                      </select>
+                      entrées par page
+                    </label>
+                  </div>
+                  <div class="datatable-search">
+                    <div class="input-group">
+                      <span class="input-group-text bg-light">
+                        <i class="ph-duotone ph-magnifying-glass"></i>
+                      </span>
+                      <input class="form-control" placeholder="Rechercher un client..." type="search" name="search" title="Rechercher dans la liste" aria-controls="pc-dt-simple-1" />
+                    </div>
+                  </div>
+                </div>
+                <div class="datatable-container">
+                  <table class="table table-hover datatable-table" id="pc-dt-simple-1">
+                    <thead>
+                      <tr>
+                        <th>NOM CLIENT</th>
+                        <th>EMAIL</th>
+                        <th>ADRESSE</th>
+                        <th>TELEPHONE</th>
+                        <th>SOCIETE</th>
+                        <th>NUMERO TVA</th>
+                        <th>VILLE</th>
+                        <th>PAYS</th>
+                        <th class="text-center">ACTIONS</th>
+                        <th class="text-center">DÉTAILS</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let client of clientsResponse" class="align-middle" style="transition: all 0.2s ease;">
+                        <td>
+                          <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                              <div class="avtar bg-light-primary text-primary" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                                <i class="ph-duotone ph-user f-18"></i>
+                              </div>
+                            </div>
+                            <div class="flex-grow-1 ms-2">
+                              <h6 class="mb-0">{{ client.nom }}</h6>
+                            </div>
+                          </div>
+                        </td>
+                        <td>
+                          <a href="mailto:{{ client.email }}" class="text-muted d-flex align-items-center">
+                            <i class="ph-duotone ph-envelope me-1"></i>
+                            <span class="text-truncate" style="max-width: 200px;">{{ client.email }}</span>
+                          </a>
+                        </td>
+                        <td>
+                          <div class="d-flex align-items-center">
+                            <i class="ph-duotone ph-map-pin me-1"></i>
+                            <span class="text-truncate" style="max-width: 150px;">{{ client.adresse }}</span>
+                          </div>
+                        </td>
+                        <td>
+                          <div class="d-flex align-items-center">
+                            <i class="ph-duotone ph-phone me-1"></i>
+                            {{ client.telephone }}
+                          </div>
+                        </td>
+                        <td>
+                          <span class="text-truncate d-inline-block" style="max-width: 120px;">{{ client.societe }}</span>
+                        </td>
+                        <td>{{ client.numeroTVA }}</td>
+                        <td>{{ client.ville }}</td>
+                        <td>{{ client.pays }}</td>
+                        <td class="text-center">
+                          <a [routerLink]="['/dashboard/clients/edit', client.trackingId]" class="avtar avtar-s btn-link-success btn-pc-default me-2" title="Modifier" style="transition: all 0.2s ease;">
+                            <i class="bx bx-edit-alt f-20"></i>
+                          </a>
+                          <a (click)="deleteClient(client.trackingId)" class="avtar avtar-s btn-link-danger btn-pc-default" title="Supprimer" style="cursor: pointer; transition: all 0.2s ease;">
+                            <i class="bx bx-trash-alt f-20"></i>
+                          </a>
+                        </td>
+                        <td class="text-center">
+                          <a [routerLink]="['/dashboard/clients/details', client.trackingId]" class="avtar avtar-s btn-link-info btn-pc-default" title="Détails" style="cursor: pointer; transition: all 0.2s ease;">
+                            <i class="bx bx-show f-20"></i>
+                          </a>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="datatable-bottom">
+                  <div class="datatable-info">
+                    Affichage de 1 à {{ clientsResponse.length }} sur {{ clientsResponse.length }} entrées
+                  </div>
+                  <nav class="datatable-pagination">
+                    <ul class="datatable-pagination-list"></ul>
+                  </nav>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- [ Main Content ] end -->
+  </div>
+</div>

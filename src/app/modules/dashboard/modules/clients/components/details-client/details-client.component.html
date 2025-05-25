@@ -1,0 +1,102 @@
+<div class="pc-container">
+  <div class="pc-content">
+    <!-- [ breadcrumb ] start -->
+    <div class="page-header mb-4">
+      <div class="page-block">
+        <div class="row align-items-center">
+          <div class="col-md-12">
+            <nav aria-label="breadcrumb">
+              <ol class="breadcrumb m-0">
+                <li class="breadcrumb-item">
+                  <a href="..\dashboard\index.html" class="text-decoration-none">
+                    <i class="ti ti-home me-1"></i>Tableau de Bord
+                  </a>
+                </li>
+                <li class="breadcrumb-item">
+                  <a href="javascript: void(0)" class="text-decoration-none">Clients</a>
+                </li>
+                <li aria-current="page" class="breadcrumb-item active">Détails</li>
+              </ol>
+            </nav>
+          </div>
+          <div class="col-md-12 mt-3">
+            <h2 class="mb-0 fw-bold">Détails du Client</h2>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- [ breadcrumb ] end -->
+
+    <!-- [ Main Content ] start -->
+    <div class="row justify-content-center min-vh-100">
+      <div class="col-lg-8 col-md-10">
+        <div class="card shadow-lg">
+          <div class="card-header bg-primary py-3">
+            <h3 class="fw-bold text-white mb-0 text-center">
+              <i class="ti ti-user me-2"></i>Détails du Client
+            </h3>
+          </div>
+
+          <div class="card-body p-4">
+            <div class="mb-4 text-center">
+              <h4 class="text-primary mb-3">Nom</h4>
+              <p class="fs-5 text-dark mb-0">{{ client.nom }}</p>
+            </div>
+
+            <div class="row mb-4">
+              <div class="col-sm-6">
+                <div class="p-3 border rounded text-center">
+                  <h5 class="text-primary mb-2">Email</h5>
+                  <p class="mb-0">{{ client.email }}</p>
+                </div>
+              </div>
+              <div class="col-sm-6">
+                <div class="p-3 border rounded text-center">
+                  <h5 class="text-primary mb-2">Téléphone</h5>
+                  <p class="mb-0">{{ client.telephone }}</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="row mb-4">
+              <div class="col-sm-6">
+                <div class="p-3 border rounded text-center">
+                  <h5 class="text-primary mb-2">Adresse</h5>
+                  <p class="mb-0">{{ client.adresse }}</p>
+                </div>
+              </div>
+              <div class="col-sm-6">
+                <div class="p-3 border rounded text-center">
+                  <h5 class="text-primary mb-2">Ville / Pays</h5>
+                  <p class="mb-0">{{ client.ville }}, {{ client.pays }}</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="row mb-4">
+              <div class="col-sm-6">
+                <div class="p-3 border rounded text-center">
+                  <h5 class="text-primary mb-2">Société</h5>
+                  <p class="mb-0">{{ client.societe }}</p>
+                </div>
+              </div>
+              <div class="col-sm-6">
+                <div class="p-3 border rounded text-center">
+                  <h5 class="text-primary mb-2">Numéro TVA</h5>
+                  <p class="mb-0">{{ client.numeroTVA }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card-footer bg-light text-center p-4">
+            <a href="/clients" class="btn btn-outline-primary">
+              <i class="ti ti-arrow-left me-1"></i>Retour à la liste
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- [ Main Content ] end -->
+  </div>
+</div>
