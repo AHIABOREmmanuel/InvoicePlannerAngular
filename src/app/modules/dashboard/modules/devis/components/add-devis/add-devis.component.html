@@ -279,27 +279,15 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
-        <div class="input-group mb-3">
-          <span class="input-group-text"><i class='bx bx-search'></i></span>
-          <input type="text"
-                 class="form-control"
-                 placeholder="Rechercher un client par nom, société ou email..."
-                 [(ngModel)]="searchTermClient"
-                 (input)="filterClients()"
-                 autofocus>
-          <button class="btn btn-outline-secondary" type="button" (click)="clearClientSearch()">
-            <i class='bx bx-x'></i>
-          </button>
-        </div>
-
+        <input type="text" class="form-control mb-3" placeholder="Rechercher un client..."
+          [(ngModel)]="searchTermClient">
         <div class="table-responsive">
           <table class="table table-hover">
-            <thead class="table-light">
+            <thead>
               <tr>
                 <th>Nom</th>
                 <th>Société</th>
                 <th>Email</th>
-                <th>Téléphone</th>
                 <th>Action</th>
               </tr>
             </thead>
@@ -308,19 +296,10 @@
                 <td>{{client.nom}}</td>
                 <td>{{client.societe}}</td>
                 <td>{{client.email}}</td>
-                <td>{{client.telephone}}</td>
                 <td>
                   <button class="btn btn-sm btn-primary" (click)="selectClient(client)">
-                    <i class='bx bx-check'></i> Sélectionner
+                    Sélectionner
                   </button>
-                </td>
-              </tr>
-              <tr *ngIf="filteredClients.length === 0">
-                <td colspan="5" class="text-center py-3">
-                  <div class="text-muted">
-                    <i class='bx bx-search-alt fs-4'></i>
-                    <p class="mb-0">Aucun client trouvé</p>
-                  </div>
                 </td>
               </tr>
             </tbody>
@@ -349,7 +328,7 @@
                 <th>Désignation</th>
                 <th>Description</th>
                 <th>Prix</th>
-                <th>Sélection</th>
+                <th>Action</th>
               </tr>
             </thead>
             <tbody>
@@ -358,22 +337,14 @@
                 <td>{{prestation.description}}</td>
                 <td>{{prestation.prixUnitaire}} CFA</td>
                 <td>
-                  <div class="form-check">
-                    <input class="form-check-input" type="checkbox"
-                           [checked]="isPrestationSelected(prestation)"
-                           (change)="togglePrestationSelection(prestation)">
-                  </div>
+                  <button class="btn btn-sm btn-primary" (click)="selectPrestation(prestation)">
+                    Ajouter
+                  </button>
                 </td>
               </tr>
             </tbody>
           </table>
         </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
-        <button type="button" class="btn btn-primary" (click)="addSelectedPrestations()" [disabled]="selectedPrestations.length === 0">
-          <i class='bx bx-plus'></i> Ajouter les tâches sélectionnées
-        </button>
       </div>
     </div>
   </div>
