@@ -254,13 +254,31 @@ export class AddDevisComponent implements OnInit {
   }
 
   filterClients(): void {
-    const term = this.searchTermClient.toLowerCase();
-    this.filteredClients = this.clients.filter((client) =>
-      client.nom.toLowerCase().includes(term) ||
-      client.email.toLowerCase().includes(term) ||
-      (client.societe && client.societe.toLowerCase().includes(term))
-    );
-    console.log(`Recherche client "${term}", résultats:`, this.filteredClients);
+    const term = this.searchTermClient.toLowerCase().trim();
+    if (!term) {
+      this.filteredClients = [...this.clients];
+      return;
+    }
+
+    this.filteredClients = this.clients.filter((client) => {
+      const searchFields = [
+        client.nom,
+        client.societe,
+        client.email,
+        client.telephone
+      ].filter(field => field); // Filtrer les champs undefined/null
+
+      return searchFields.some(field =>
+        field.toLowerCase().includes(term)
+      );
+    });
+
+    console.log(`Recherche client "${term}", résultats:`, this.filteredClients.length);
+  }
+
+  clearClientSearch(): void {
+    this.searchTermClient = '';
+    this.filteredClients = [...this.clients];
   }
 
   filterPrestations(): void {
