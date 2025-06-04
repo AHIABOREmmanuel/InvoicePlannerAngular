@@ -1,0 +1,491 @@
+<div class="pc-container">
+  <div class="pc-content">
+    <!-- [ breadcrumb ] start -->
+    <div class="page-header mb-4">
+      <div class="page-block">
+        <div class="row align-items-center">
+          <div class="col-md-12">
+            <nav aria-label="breadcrumb">
+              <ol class="breadcrumb m-0">
+                <li class="breadcrumb-item">
+                  <a [routerLink]="['/dashboard']" class="text-decoration-none">
+                    <i class="ti ti-home me-1"></i>Tableau de Bord
+                  </a>
+                </li>
+                <li aria-current="page" class="breadcrumb-item active">Devis</li>
+              </ol>
+            </nav>
+          </div>
+          <div class="col-md-12 mt-3 d-flex justify-content-between align-items-center">
+            <h2 class="mb-0 fw-bold">Gestion des Devis</h2>
+            <div>
+              <button class="btn btn-primary d-flex align-items-center" [routerLink]="['add-devis']">
+                <i class="ti ti-plus me-2"></i>Nouveau devis
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- [ breadcrumb ] end -->
+
+    <div class="row">
+      <div class="col-sm-12">
+        <div class="card shadow-sm">
+          <div class="card-header bg-light d-flex justify-content-between align-items-center py-3">
+            <h5 class="mb-0"><i class="ti ti-file-invoice me-2"></i>Liste des devis</h5>
+          </div>
+          <div class="card-body p-0">
+            <!-- État de chargement -->
+            <div *ngIf="isLoading" class="text-center p-5">
+              <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Chargement...</span>
+              </div>
+              <p class="mt-3 mb-0">Chargement des devis...</p>
+            </div>
+
+            <!-- Message d'erreur -->
+            <div *ngIf="errorMessage && !isLoading" class="p-4">
+              <div class="alert alert-danger d-flex align-items-center mb-0">
+                <i class="ti ti-alert-circle me-2 fs-5"></i>
+                <div>{{ errorMessage }}</div>
+              </div>
+            </div>
+
+            <!-- Aucun devis -->
+            <div *ngIf="!isLoading && !errorMessage && (!devis || devis.length === 0)" class="text-center p-5">
+              <div class="text-muted mb-3">
+                <i class="ti ti-file-off" style="font-size: 3rem;"></i>
+              </div>
+              <h4>Aucun devis disponible</h4>
+              <p class="mb-3">Vous n'avez pas encore créé de devis.</p>
+              <button class="btn btn-primary" [routerLink]="['add-devis']">
+                <i class="ti ti-plus me-2"></i>Créer votre premier devis
+              </button>
+            </div>
+
+            <!-- Filtres et recherche -->
+            <div *ngIf="!isLoading && !errorMessage && devis && devis.length > 0" class="p-4 border-bottom">
+              <div class="row g-3">
+                <div class="col-md-4">
+                  <div class="input-group">
+                    <span class="input-group-text">
+                      <i class="ti ti-search"></i>
+                    </span>
+                    <input
+                      type="text"
+                      class="form-control"
+                      placeholder="Rechercher un devis..."
+                      [(ngModel)]="searchTerm"
+                      (ngModelChange)="applyFilters()"
+                    />
+                  </div>
+                </div>
+                <div class="col-md-8">
+                  <div class="d-flex flex-wrap gap-2 justify-content-md-end">
+                    <div class="btn-group" role="group">
+                      <button
+                      type="button"
+                      class="btn"
+                      [ngClass]="{
+                        'btn-primary': activeFilter === 'tous',
+                        'btn-outline-primary': activeFilter !== 'tous'
+                      }"
+                      (click)="filterDevis('tous')"
+                    >
+                      Tous
+                    </button>
+                    <button
+                      type="button"
+                      class="btn"
+                      [ngClass]="{
+                        'btn-primary': activeFilter === 'BROUILLON',
+                        'btn-outline-primary': activeFilter !== 'BROUILLON'
+                      }"
+                      (click)="filterDevis('BROUILLON')"
+                    >
+                      Brouillons
+                    </button>
+                    <button
+                      type="button"
+                      class="btn"
+                      [ngClass]="{
+                        'btn-primary': activeFilter === 'ENVOYE',
+                        'btn-outline-primary': activeFilter !== 'ENVOYE'
+                      }"
+                      (click)="filterDevis('ENVOYE')"
+                    >
+                      Envoyés
+                    </button>
+                    <button
+                      type="button"
+                      class="btn"
+                      [ngClass]="{
+                        'btn-primary': activeFilter === 'ACCEPTE',
+                        'btn-outline-primary': activeFilter !== 'ACCEPTE'
+                      }"
+                      (click)="filterDevis('ACCEPTE')"
+                    >
+                      Acceptés
+                    </button>
+                    <button
+                      type="button"
+                      class="btn"
+                      [ngClass]="{
+                        'btn-primary': activeFilter === 'REFUSE',
+                        'btn-outline-primary': activeFilter !== 'REFUSE'
+                      }"
+                      (click)="filterDevis('REFUSE')"
+                    >
+                      Refusés
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Vue en cartes -->
+            <div *ngIf="!isLoading && !errorMessage && filteredDevis && filteredDevis.length > 0" class="p-4">
+              <div class="row g-3">
+                <div *ngFor="let d of filteredDevis" class="col-md-6 col-lg-4">
+                  <div class="card shadow-sm h-100">
+                    <!-- En-tête avec statut -->
+                    <div class="card-header p-3" [ngClass]="{
+                      'bg-light': d.statut === 'BROUILLON',
+                      'bg-info-subtle': d.statut === 'ENVOYE',
+                      'bg-success-subtle': d.statut === 'ACCEPTE',
+                      'bg-danger-subtle': d.statut === 'REFUSE'
+                    }">
+                      <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                          <span class="badge" [ngClass]="{
+                            'bg-secondary': d.statut === 'BROUILLON',
+                            'bg-info': d.statut === 'ENVOYE',
+                            'bg-success': d.statut === 'ACCEPTE',
+                            'bg-danger': d.statut === 'REFUSE'
+                          }">
+                            <i class="ti" [ngClass]="{
+                              'ti-pencil': d.statut === 'BROUILLON',
+                              'ti-send': d.statut === 'ENVOYE',
+                              'ti-check': d.statut === 'ACCEPTE',
+                              'ti-x': d.statut === 'REFUSE'
+                            }"></i>
+                            {{ d.statut | titlecase }}
+                          </span>
+                        </div>
+                        <div>
+                          <select
+                            class="form-select form-select-sm"
+                            [(ngModel)]="d.statut"
+                            (change)="updateDevisStatus(d)"
+                            (click)="$event.stopPropagation()"
+                          >
+                            <option value="BROUILLON">Brouillon</option>
+                            <option value="ENVOYE">Envoyé</option>
+                            <option value="ACCEPTE">Accepté</option>
+                            <option value="REFUSE">Refusé</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+
+                  <!-- Corps du fichier -->
+                  <div class="card-body p-3 cursor-pointer" (click)="openDetailsModal(d)">
+                    <h5 class="card-title mb-3 fw-bold text-truncate">{{ d.nomProjet }}</h5>
+                    <div class="mb-3">
+                      <div class="d-flex align-items-center mb-2">
+                        <i class="ti ti-file-invoice me-2 text-primary"></i>
+                        <span class="text-muted">Réf: </span>
+                        <span class="ms-1 fw-medium">{{ d.reference }}</span>
+                      </div>
+                      <div class="d-flex align-items-center mb-2">
+                        <i class="ti ti-user me-2 text-primary"></i>
+                        <span class="text-muted">Client: </span>
+                        <span class="ms-1 fw-medium text-truncate">{{ d.clientName || d.clientTrackingId }}</span>
+                      </div>
+                      <div class="d-flex align-items-center mb-2">
+                        <i class="ti ti-calendar me-2 text-primary"></i>
+                        <span class="text-muted">Émis le: </span>
+                        <span class="ms-1 fw-medium">{{ d.dateEmission | date : "dd/MM/yyyy" }}</span>
+                      </div>
+                      <div class="d-flex align-items-center">
+                        <i class="ti ti-coin me-2 text-primary"></i>
+                        <span class="text-muted">Montant: </span>
+                        <span class="ms-1 fw-bold">{{ d.prixTTC | currency : "CFA" }}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Actions rapides -->
+                  <div class="card-footer p-3 bg-light d-flex justify-content-between">
+                    <div>
+                      <button
+                        class="btn btn-sm btn-outline-secondary me-1"
+                        [routerLink]="['edit-devis', d.trackingId]"
+                        title="Modifier"
+                        (click)="$event.stopPropagation()"
+                      >
+                        <i class="ti ti-edit"></i>
+                      </button>
+                      <button
+                        class="btn btn-sm btn-outline-danger"
+                        (click)="deleteDevis(d); $event.stopPropagation()"
+                        title="Supprimer"
+                      >
+                        <i class="ti ti-trash"></i>
+                      </button>
+                    </div>
+                    <div>
+                      <button
+                        class="btn btn-sm btn-outline-primary me-1"
+                        (click)="downloadDevis(d); $event.stopPropagation()"
+                        title="Télécharger"
+                      >
+                        <i class="ti ti-download"></i>
+                      </button>
+                      <button
+                        class="btn btn-sm btn-success"
+                        (click)="convertToFacture(d); $event.stopPropagation()"
+                        title="Transformer en facture"
+                        *ngIf="d.statut === 'ACCEPTE'"
+                      >
+                        <i class="ti ti-file-invoice"></i> Facture
+                      </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Empty state -->
+              <div
+                *ngIf="
+                  !isLoading && !errorMessage && filteredDevis.length === 0
+                "
+                class="col-12"
+              >
+                <div class="empty-state">
+                  <div class="empty-icon">
+                    <i class='bx bx-file-x fs-1'></i>
+                  </div>
+                  <h4>Aucun devis trouvé</h4>
+                  <p class="text-muted">
+                    Il n'y a pas de devis correspondant à votre recherche
+                  </p>
+                  <button
+                    class="btn btn-primary"
+                    [routerLink]="['add-devis']"
+                  >
+                    <i class='bx bx-plus me-2'></i>Créer un devis
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de détails -->
+    <div class="modal fade" id="devisDetailsModal" tabindex="-1">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" *ngIf="selectedDevis">
+              Détails du devis - {{ selectedDevis.reference }}
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body" *ngIf="selectedDevis">
+            <div class="row">
+              <!-- Informations du devis -->
+              <div class="col-md-6">
+                <h6 class="border-bottom pb-2">Informations générales</h6>
+                <div class="mb-3">
+                  <p class="mb-1">
+                    <strong>Projet:</strong> {{ selectedDevis.nomProjet }}
+                  </p>
+                  <p class="mb-1">
+                    <strong>Référence:</strong> {{ selectedDevis.reference }}
+                  </p>
+                  <p class="mb-1">
+                    <strong>État:</strong>
+                    <span
+                      [ngClass]="{
+                        'badge bg-secondary':
+                          selectedDevis.statut === 'brouillon',
+                        'badge bg-info': selectedDevis.statut === 'envoye',
+                        'badge bg-success': selectedDevis.statut === 'accepte',
+                        'badge bg-danger': selectedDevis.statut === 'refuse'
+                      }"
+                      >{{ selectedDevis.statut | titlecase }}</span
+                    >
+                  </p>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <h6 class="border-bottom pb-2">Dates</h6>
+                <div class="mb-3">
+                  <p class="mb-1">
+                    <strong>Émission:</strong>
+                    {{ selectedDevis.dateEmission | date : "dd/MM/yyyy" }}
+                  </p>
+                  <p class="mb-1">
+                    <strong>Échéance:</strong>
+                    {{ selectedDevis.dateEcheance | date : "dd/MM/yyyy" }}
+                  </p>
+                  <p class="mb-1" *ngIf="selectedDevis.dateEmission">
+                    <strong>Validation:</strong>
+                    {{ selectedDevis.dateEmission | date : "dd/MM/yyyy" }}
+                  </p>
+                </div>
+              </div>
+
+              <!-- Client -->
+              <div class="col-12">
+                <h6 class="border-bottom pb-2 mt-2">Client</h6>
+                <div class="mb-3">
+                  <p class="mb-1">
+                    <strong>ID:</strong> {{ selectedDevis.clientTrackingId }}
+                  </p>
+                  <p class="mb-1" *ngIf="selectedDevis.clientName">
+                    <strong>Nom:</strong> {{ selectedDevis.clientName }}
+                  </p>
+                  <p class="mb-1" *ngIf="selectedDevis.clientEmail">
+                    <strong>Email:</strong> {{ selectedDevis.clientEmail }}
+                  </p>
+                </div>
+              </div>
+
+              <!-- Liste d'items (si disponible) -->
+              <div class="col-12">
+                <h6 class="border-bottom pb-2 mt-2">Détails des prestations</h6>
+                <div class="table-responsive">
+                  <table class="table table-sm">
+                    <thead>
+                      <tr>
+                        <th>Description</th>
+                        <th class="text-end">Quantité</th>
+                        <th class="text-end">Prix unitaire</th>
+                        <th class="text-end">Total</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let item of selectedDevis.prestations || []">
+                        <td>{{ item.description }}</td>
+                        <td class="text-end">{{ item.prixTotal }}</td>
+                        <td class="text-end">
+                          {{ item.prixUnitaire | currency : "CFA" }}
+                        </td>
+                        <td class="text-end">
+                          {{
+                            item.prixTotal * item.prixUnitaire
+                              | currency : "CFA"
+                          }}
+                        </td>
+                      </tr>
+                      <tr
+                        *ngIf="
+                          !selectedDevis.prestations ||
+                          selectedDevis.prestations.length === 0
+                        "
+                      >
+                        <td colspan="4" class="text-center">
+                          Aucun détail disponible
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <!-- Résumé financier -->
+              <div class="col-12">
+                <h6 class="border-bottom pb-2 mt-2">Résumé financier</h6>
+                <div class="card bg-light">
+                  <div class="card-body">
+                    <div class="row">
+                      <div class="col-6">
+                        <p class="mb-1">Prix HT:</p>
+                        <p class="mb-1">TVA ({{ selectedDevis.tva }}%):</p>
+                        <p class="mb-1" *ngIf="selectedDevis.remise > 0">
+                          Remise:
+                        </p>
+                        <p class="fw-bold mb-0">Total TTC:</p>
+                      </div>
+                      <div class="col-6 text-end">
+                        <p class="mb-1">
+                          {{ selectedDevis.prixTotal | currency : "CFA" }}
+                        </p>
+                        <p class="mb-1">
+                          {{
+                            (selectedDevis.prixTotal * selectedDevis.tva) / 100
+                              | currency : "CFA"
+                          }}
+                        </p>
+                        <p
+                          class="mb-1 text-danger"
+                          *ngIf="selectedDevis.remise > 0"
+                        >
+                          -{{ selectedDevis.remise | currency : "CFA" }}
+                        </p>
+                        <p class="fw-bold mb-0">
+                          {{ selectedDevis.prixTTC | currency : "CFA" }}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Notes -->
+              <div class="col-12 mt-3" *ngIf="selectedDevis.notes">
+                <h6 class="border-bottom pb-2">Notes</h6>
+                <p>{{ selectedDevis.notes }}</p>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              *ngIf="selectedDevis?.statut === 'ACCEPTE'"
+              class="btn btn-success"
+              (click)="convertToFacture(selectedDevis!)"
+              data-bs-dismiss="modal"
+            >
+              <i class='bx bx-file me-2'></i>Convertir en facture
+            </button>
+            <button
+              class="btn btn-outline-primary"
+              [routerLink]="[
+                '/dashboard/devis/edit-devis',
+                selectedDevis?.trackingId
+              ]"
+              data-bs-dismiss="modal"
+            >
+              <i class='bx bx-pencil me-2'></i>Modifier
+            </button>
+            <button
+              class="btn btn-outline-secondary"
+              (click)="downloadDevis(selectedDevis!)"
+              data-bs-dismiss="modal"
+              *ngIf="selectedDevis"
+            >
+              <i class='bx bx-download me-2'></i>Télécharger
+            </button>
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Fermer
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End of Selection -->

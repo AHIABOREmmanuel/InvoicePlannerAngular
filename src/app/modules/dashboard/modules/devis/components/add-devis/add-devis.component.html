@@ -1,0 +1,492 @@
+<div class="pc-container">
+  <div class="row ">
+    <div class="row pc-content">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-header">
+            <h4 class="mb-0">Nouveau devis</h4>
+          </div>
+          <div class="card-body">
+            <form [formGroup]="devisForm" (ngSubmit)="onSubmit()">
+              <!-- Informations générales -->
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <label class="form-label">Référence</label>
+                  <input type="text" class="form-control" formControlName="reference">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Nom du projet</label>
+                  <input type="text" class="form-control" formControlName="nomProjet">
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <div class="col-12">
+                  <label class="form-label">Description</label>
+                  <textarea class="form-control" formControlName="description" rows="2"></textarea>
+                </div>
+              </div>
+
+              <!-- Client -->
+              <div class="row mb-3">
+                <div class="col-md-9">
+                  <label class="form-label">Client</label>
+                  <div class="input-group">
+                    <input type="text" class="form-control" formControlName="client" [value]="selectedClient?.nom || ''"
+                      readonly>
+                    <button type="button" class="btn btn-outline-secondary" (click)="openClientModal()">
+                      <i class='bx  bx-search-alt'></i> Sélectionner
+                    </button>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">Statut</label>
+                  <select class="form-select" formControlName="statut">
+                    <option value="BROUILLON">Brouillon</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Dates -->
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <label for="dateEmission" class="form-label">Date d'émission</label>
+                  <input id="dateEmission" type="date" class="form-control" formControlName="dateEmission" [min]="today"
+                    [value]="today">
+                </div>
+                <div class="col-md-6">
+                  <label for="dateEcheance" class="form-label">Date d'échéance</label>
+                  <input id="dateEcheance" type="date" class="form-control" formControlName="dateEcheance"
+                    [min]="todayPlusOneMonth" [value]="todayPlusOneMonth">
+                </div>
+              </div>
+
+              <!-- Prestations -->
+              <h5 class="mt-4">Tâches</h5>
+              <div class="table-responsive mb-3">
+                <table class="table table-bordered">
+                  <thead class="table-light">
+                    <tr>
+                      <th>#</th>
+                      <th>Désignation</th>
+                      <th>Description</th>
+                      <th>Prix unitaire</th>
+                      <th>Durée/Qté</th>
+                      <th>Total</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody formArrayName="prestations">
+                    <tr *ngFor="let prestation of prestationsArray.controls; let i = index" [formGroupName]="i">
+                      <td>{{i + 1}}</td>
+                      <td><input type="text" class="form-control form-control-sm" formControlName="designation"></td>
+                      <td><input type="text" class="form-control form-control-sm" formControlName="description"></td>
+                      <td><input type="number" class="form-control form-control-sm" formControlName="prixUnitaire"
+                          (input)="updatePrestationTotal(i)"></td>
+                      <td><input type="number" class="form-control form-control-sm" formControlName="duree"
+                          (input)="updatePrestationTotal(i)"></td>
+                      <td><input type="number" class="form-control form-control-sm" formControlName="prixTotal"
+                          readonly>
+                      </td>
+                      <td>
+                        <button type="button" class="btn btn-sm btn-danger" (click)="removePrestation(i)">
+                          <i class='bx  bx-trash'></i>
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="mb-3">
+                <button type="button" class="btn btn-outline-primary" (click)="addEmptyPrestation()">
+                  <i class='bx  bx-plus'></i> Ajouter tâche
+                </button>
+                <button type="button" class="btn btn-outline-secondary ms-2" (click)="openPrestationModal()">
+                  <i class='bx  bx-list-plus'></i> Catalogue
+                </button>
+              </div>
+
+              <!-- Totaux -->
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label class="form-label">Notes</label>
+                    <textarea class="form-control" formControlName="notes" rows="4"></textarea>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="card">
+                    <div class="card-body">
+                      <div class="row mb-2">
+                        <label class="col-6">Total HT</label>
+                        <div class="col-6 text-end">{{totalHT}} CFA</div>
+                      </div>
+                      <div class="row mb-2">
+                        <div class="col-6">
+                          <div class="input-group input-group-sm">
+                            <input type="number" class="form-control" formControlName="tva" (input)="updateTotals()">
+                            <span class="input-group-text">% TVA</span>
+                          </div>
+                        </div>
+                        <div class="col-6 text-end">{{montantTVA}} CFA</div>
+                      </div>
+                      <div class="row mb-2">
+                        <div class="col-6">
+                          <div class="input-group input-group-sm">
+                            <input type="number" class="form-control" formControlName="remise" (input)="updateTotals()">
+                            <span class="input-group-text">% Remise</span>
+                          </div>
+                        </div>
+                        <div class="col-6 text-end">-{{montantRemise}} CFA</div>
+                      </div>
+                      <hr>
+                      <div class="row fw-bold">
+                        <label class="col-6">Total TTC</label>
+                        <div class="col-6 text-end">{{totalTTC}} CFA</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="text-end mb-5">
+                <button type="button" class="btn btn-secondary me-2" (click)="previewDevis()">
+                  <i class='bx  bx-show'></i> Prévisualiser
+                </button>
+                <button type="submit" class="btn btn-primary" [disabled]="devisForm.invalid || loading">
+                  <i class='bx  bx-save'></i> Enregistrer
+                  <span *ngIf="loading" class="spinner-border spinner-border-sm ms-1"></span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Aperçu rapide -->
+      <div class="col-md-12" *ngIf="showPreview">
+        <div class="card">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Aperçu</h5>
+            <button type="button" class="btn-close" (click)="showPreview = false"></button>
+          </div>
+          <div class="card-body preview-pane">
+            <!-- En-tête avec logo -->
+            <div class="d-flex justify-content-between mb-4">
+              <div>
+                <h4>{{companyProfile?.companyName || 'Votre Entreprise'}}</h4>
+                <p class="mb-1">{{companyProfile?.address}}</p>
+                <p class="mb-1">{{companyProfile?.postalCode}} {{companyProfile?.city}}</p>
+                <p>{{companyProfile?.email}} | {{companyProfile?.phoneNumber}}</p>
+              </div>
+              <div>
+                <img [src]="previewUrl" alt="Logo" height="130" *ngIf="companyProfile?.hasLogo"> <!--Miniature-->
+              </div>
+            </div>
+
+            <!-- Devis info -->
+            <div class="text-center mb-4">
+              <h2>Devis {{devisForm.get('reference')?.value}}</h2>
+              <p>Projet: {{devisForm.get('nomProjet')?.value}}</p>
+            </div>
+
+            <!-- Dates -->
+            <div class="row mb-3">
+              <div class="col-6">
+                <p><strong>Date:</strong> {{devisForm.get('dateEmission')?.value | date:'dd/MM/yyyy'}}</p>
+              </div>
+              <div class="col-6 text-end">
+                <p><strong>Échéance:</strong> {{devisForm.get('dateEcheance')?.value | date:'dd/MM/yyyy'}}</p>
+              </div>
+            </div>
+
+            <!-- Client -->
+            <div class="mb-4">
+              <h5>Client</h5>
+              <p class="mb-1">{{selectedClient?.nom}}</p>
+              <p class="mb-1">{{selectedClient?.societe}}</p>
+              <p class="mb-1">{{selectedClient?.adresse}}</p>
+              <p>{{selectedClient?.email}} | {{selectedClient?.telephone}}</p>
+            </div>
+
+            <!-- Détail prestations -->
+            <div class="table-responsive mb-3">
+              <table class="table table-sm">
+                <thead>
+                  <tr>
+                    <th>Désignation</th>
+                    <th class="text-end">PU</th>
+                    <th class="text-end">Qté</th>
+                    <th class="text-end">Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let prestation of prestationsArray.value">
+                    <td>
+                      {{prestation.designation}}
+                      <div class="text-muted small" *ngIf="prestation.description">{{prestation.description}}</div>
+                    </td>
+                    <td class="text-end">{{prestation.prixUnitaire}} CFA</td>
+                    <td class="text-end">{{prestation.duree}}</td>
+                    <td class="text-end">{{prestation.prixTotal}} CFA</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Totaux -->
+            <div class="row justify-content-end mb-4">
+              <div class="col-6">
+                <div class="d-flex justify-content-between mb-2">
+                  <span>Total HT:</span>
+                  <span>{{totalHT}} CFA</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                  <span>TVA ({{devisForm.get('tva')?.value}}%):</span>
+                  <span>{{montantTVA}} CFA</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                  <span>Remise ({{devisForm.get('remise')?.value}}%):</span>
+                  <span>-{{montantRemise}} CFA</span>
+                </div>
+                <hr>
+                <div class="d-flex justify-content-between fw-bold">
+                  <span>Total TTC:</span>
+                  <span>{{totalTTC}} CFA</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Notes -->
+            <div *ngIf="devisForm.get('notes')?.value">
+              <h6>Notes</h6>
+              <p>{{devisForm.get('notes')?.value}}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal sélection client -->
+<div class="modal fade" style="display: block; width: 40%;" id="clientModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Sélectionner un client</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <input type="text" class="form-control mb-3" placeholder="Rechercher un client..."
+          [(ngModel)]="searchTermClient">
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>Nom</th>
+                <th>Société</th>
+                <th>Email</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let client of filteredClients">
+                <td>{{client.nom}}</td>
+                <td>{{client.societe}}</td>
+                <td>{{client.email}}</td>
+                <td>
+                  <button class="btn btn-sm btn-primary" (click)="selectClient(client)">
+                    Sélectionner
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal sélection prestations -->
+<div class="modal fade" id="prestationModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Catalogue de tâches</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <input type="text" class="form-control mb-3" placeholder="Rechercher une prestation..."
+          [(ngModel)]="searchTermPrestation">
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>Désignation</th>
+                <th>Description</th>
+                <th>Prix</th>
+                <th>Sélection</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let prestation of filteredPrestations">
+                <td>{{prestation.designation}}</td>
+                <td>{{prestation.description}}</td>
+                <td>{{prestation.prixUnitaire}} CFA</td>
+                <td>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox"
+                           [checked]="isPrestationSelected(prestation)"
+                           (change)="togglePrestationSelection(prestation)">
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+        <button type="button" class="btn btn-primary" (click)="addSelectedPrestations()" [disabled]="selectedPrestations.length === 0">
+          <i class='bx bx-plus'></i> Ajouter les tâches sélectionnées
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal prévisualisation complète -->
+<div class="modal fade" id="previewModal" tabindex="-1">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Prévisualisation du devis</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="devis-preview p-4">
+          <!-- Contenu de la prévisualisation (similaire à l'aperçu rapide mais en pleine page) -->
+          <!-- En-tête avec logo -->
+          <div class="row mb-5">
+            <div class="col-6">
+              <h3>{{companyProfile?.companyName || 'Votre Entreprise'}}</h3>
+              <p class="mb-1">{{companyProfile?.address}}</p>
+              <p class="mb-1">{{companyProfile?.postalCode}} {{companyProfile?.city}}</p>
+              <p class="mb-1">{{companyProfile?.email}}</p>
+              <p>{{companyProfile?.phoneNumber}}</p>
+            </div>
+            <div class="col-6 text-end">
+              <img [src]="previewUrl" alt="Logo" height="130" *ngIf="companyProfile?.hasLogo">
+            </div>
+          </div>
+
+          <div class="row mb-5">
+            <div class="col-6">
+              <div class="client-box p-3 border">
+                <h5>Client</h5>
+                <p class="mb-1"><strong>{{selectedClient?.nom}}</strong></p>
+                <p class="mb-1">{{selectedClient?.societe}}</p>
+                <p class="mb-1">{{selectedClient?.adresse}}</p>
+                <p class="mb-1">{{selectedClient?.ville}}, {{selectedClient?.pays}}</p>
+                <p class="mb-1">TVA: {{selectedClient?.numeroTVA}}</p>
+                <p>{{selectedClient?.email}} | {{selectedClient?.telephone}}</p>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="devis-info text-end">
+                <h1 class="mb-3">Devis {{devisForm.get('reference')?.value}}</h1>
+                <p class="mb-1"><strong>Projet:</strong> {{devisForm.get('nomProjet')?.value}}</p>
+                <p class="mb-1"><strong>Date d'émission:</strong> {{devisForm.get('dateEmission')?.value |
+                  date:'dd/MM/yyyy'}}</p>
+                <p><strong>Date d'échéance:</strong> {{devisForm.get('dateEcheance')?.value | date:'dd/MM/yyyy'}}</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="row mb-4">
+            <div class="col-12">
+              <p>{{devisForm.get('description')?.value}}</p>
+            </div>
+          </div>
+
+          <!-- Détail prestations -->
+          <div class="table-responsive mb-4">
+            <table class="table table-striped">
+              <thead class="table-dark">
+                <tr>
+                  <th style="width: 5%">#</th>
+                  <th style="width: 30%">Désignation</th>
+                  <th style="width: 30%">Description</th>
+                  <th style="width: 10%" class="text-end">PU HT</th>
+                  <th style="width: 10%" class="text-end">Qté</th>
+                  <th style="width: 15%" class="text-end">Total HT</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let prestation of prestationsArray.value; let i = index">
+                  <td>{{i + 1}}</td>
+                  <td>{{prestation.designation}}</td>
+                  <td>{{prestation.description}}</td>
+                  <td class="text-end">{{prestation.prixUnitaire}} CFA</td>
+                  <td class="text-end">{{prestation.duree}}</td>
+                  <td class="text-end">{{prestation.prixTotal}} CFA</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Totaux -->
+          <div class="row justify-content-end mb-5">
+            <div class="col-4">
+              <table class="table table-sm">
+                <tr>
+                  <th>Total HT</th>
+                  <td class="text-end">{{totalHT}} CFA</td>
+                </tr>
+                <tr>
+                  <th>TVA ({{devisForm.get('tva')?.value}}%)</th>
+                  <td class="text-end">{{montantTVA}} CFA</td>
+                </tr>
+                <tr>
+                  <th>Remise ({{devisForm.get('remise')?.value}}%)</th>
+                  <td class="text-end">-{{montantRemise}} CFA</td>
+                </tr>
+                <tr class="table-active">
+                  <th>Total TTC</th>
+                  <td class="text-end fw-bold">{{totalTTC}} CFA</td>
+                </tr>
+              </table>
+            </div>
+          </div>
+
+          <!-- Notes et conditions -->
+          <div class="row mb-4">
+            <div class="col-12">
+              <h6>Notes</h6>
+              <p>{{devisForm.get('notes')?.value || 'Aucune note'}}</p>
+            </div>
+          </div>
+
+          <!-- Signature -->
+          <div class="row mt-5">
+            <div class="col-6">
+              <p>Date et signature du client précédée de la mention<br>'Bon pour accord'</p>
+            </div>
+            <div class="col-6 text-end">
+              <p>{{companyProfile?.companyName}}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+        <button type="button" class="btn btn-primary" (click)="exportToPDF()">
+          <i class='bx  bx-file-pdf'></i> Exporter en PDF
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
